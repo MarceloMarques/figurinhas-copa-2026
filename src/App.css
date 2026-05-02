@@ -78,6 +78,7 @@ body { font-family: 'Montserrat', sans-serif; background: #f0f4f8; color: #1a202
   .dica { display: none; }
   .zap-btns { gap: 6px; }
   .btn-zap { padding: 6px 10px; font-size: 12px; }
+  .header-top h1 { font-size: 22px !important; letter-spacing: 0px !important; }
   .flag-img { width: 22px; height: auto; border-radius: 3px; vertical-align: middle; margin-right: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
   .time-pct { font-size: 11px; font-weight: 600; color: #94a3b8; margin-left: 4px; }
 .btn-zap.pdf { background: #0f172a; color: white; }
