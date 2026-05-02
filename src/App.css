@@ -86,7 +86,8 @@ body { font-family: 'Montserrat', sans-serif; background: #f0f4f8; color: #1a202
 .header-top h1 { 
   font-family: 'Righteous', sans-serif !important; 
   font-size: 28px !important; 
-  letter-spacing: 2px !important;
+  font-weight: bold !important; 
+  letter-spacing: 0px !important;
 }
 .grupo-titulo, .time-titulo, .stat-num, .stat-label { font-family: 'Righteous', sans-serif; }
 .card-cod, .card-nome { font-family: 'Montserrat', sans-serif; }
