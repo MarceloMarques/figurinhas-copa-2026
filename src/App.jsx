@@ -46,32 +46,12 @@ export default function App() {
     setSaving(null)
   }
 
-  const lastTap = useRef({})
+ 
 
 const clicar = (s) => {
-  const agora = Date.now()
-  const ultimo = lastTap.current[s.numero] || 0
-  const diff = agora - ultimo
-
-  if (diff < 300) {
-    // double tap — diminui
-    lastTap.current[s.numero] = 0
-    const atual = getQtd(s.numero)
-    if (!atual) return
-    const n = atual - 1
-    setQtds(p => ({ ...p, [s.numero]: n }))
-    salvar(s, n)
-  } else {
-    // single tap — aumenta
-    lastTap.current[s.numero] = agora
-    setTimeout(() => {
-      if (lastTap.current[s.numero] === agora) {
-        const n = getQtd(s.numero) + 1
-        setQtds(p => ({ ...p, [s.numero]: n }))
-        salvar(s, n)
-      }
-    }, 300)
-  }
+  const n = getQtd(s.numero) + 1
+  setQtds(p => ({ ...p, [s.numero]: n }))
+  salvar(s, n)
 }
 
 const desclicar = (e, s) => {
