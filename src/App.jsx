@@ -107,10 +107,11 @@ export default function App() {
   }
 
   const getCardClass = (qtd, tipo) => {
-    if (qtd === 0) return `card cinza tipo-${tipo}`
-    if (qtd === 1) return `card verde tipo-${tipo}`
-    return `card roxo tipo-${tipo}`
-  }
+  if (qtd === 0) return `card cinza tipo-${tipo}`
+  if (qtd === 1 && tipo === 'escudo') return `card dourado tipo-${tipo}`
+  if (qtd === 1) return `card verde tipo-${tipo}`
+  return `card roxo tipo-${tipo}`
+}
 
   const getSelecoesDoGrupo = (grupoId) => {
     const stickers = STICKERS_COM_NUM.filter(s => s.grupo === grupoId)

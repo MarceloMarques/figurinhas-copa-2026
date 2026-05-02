@@ -66,6 +66,7 @@ body { font-family: 'Montserrat', sans-serif; background: #f0f4f8; color: #1a202
 
 .card.cinza { background: #e5e7eb; }
 .card.verde { background: #22c55e; color: white; box-shadow: 0 2px 8px rgba(34,197,94,.3); }
+.card.dourado { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; box-shadow: 0 2px 8px rgba(245,158,11,.4); }
 .card.roxo { background: #7c3aed; color: white; box-shadow: 0 2px 8px rgba(124,58,237,.3); }
 
 .card.tipo-escudo { border: 2px solid #f59e0b; }
