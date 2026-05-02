@@ -190,7 +190,7 @@ export default function App() {
     alt="Copa 2026" 
     style={{ height: '42px', width: 'auto' }} 
   />
-  <h1 style={{ fontFamily: "'Righteous', sans-serif", fontSize: '32px', letterSpacing: '1px', fontWeight: 'bold' }}>Copa 2026</h1>
+  <h1 style={{ fontFamily: "'Righteous', sans-serif", fontSize: '32px', letterSpacing: '0px', fontWeight: '400' }}>Copa 2026</h1>
 </div>
           <div className="zap-btns">
             <button className={`btn-zap faltam ${zapMsg === 'faltam' ? 'ok' : ''}`} onClick={zapFaltam}>
