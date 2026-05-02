@@ -14,7 +14,6 @@ const FLAGS = {
 const getSigla = (cod) => cod.replace(/\d+$/, '')
 
 const STICKERS_COM_NUM = STICKERS.map((s, i) => ({ ...s, numero: i + 1 }))
-const POR_NUMERO = Object.fromEntries(STICKERS_COM_NUM.map(s => [s.numero, s]))
 
 const ICONE_TIPO = { escudo: '🛡️', foto: '📸', especial: '⭐', cc: '🥤', normal: '' }
 
@@ -46,27 +45,25 @@ export default function App() {
     setSaving(null)
   }
 
- 
+  const clicar = (s) => {
+    const n = getQtd(s.numero) + 1
+    setQtds(p => ({ ...p, [s.numero]: n }))
+    salvar(s, n)
+  }
 
-const clicar = (s) => {
-  const n = getQtd(s.numero) + 1
-  setQtds(p => ({ ...p, [s.numero]: n }))
-  salvar(s, n)
-}
-
-const desclicar = (e, s) => {
-  e.preventDefault()
-  const atual = getQtd(s.numero)
-  if (!atual) return
-  const n = atual - 1
-  setQtds(p => ({ ...p, [s.numero]: n }))
-  salvar(s, n)
-}
+  const desclicar = (e, s) => {
+    e.preventDefault()
+    const atual = getQtd(s.numero)
+    if (!atual) return
+    const n = atual - 1
+    setQtds(p => ({ ...p, [s.numero]: n }))
+    salvar(s, n)
+  }
 
   const totalColadas = STICKERS_COM_NUM.filter(s => getQtd(s.numero) >= 1).length
   const totalRepetidas = STICKERS_COM_NUM.reduce((acc, s) => acc + Math.max(0, getQtd(s.numero) - 1), 0)
   const totalFaltam = TOTAL - totalColadas
-  const progresso = Math.round((totalColadas / TOTAL) * 100).toFixed(2)
+  const progresso = ((totalColadas / TOTAL) * 100).toFixed(2)
 
   const zapFaltam = () => {
     const faltam = STICKERS_COM_NUM.filter(s => getQtd(s.numero) === 0)
@@ -103,7 +100,6 @@ const desclicar = (e, s) => {
     return `card roxo tipo-${tipo}`
   }
 
-  // Agrupa stickers por seleção dentro de cada grupo
   const getSelecoesDoGrupo = (grupoId) => {
     const stickers = STICKERS_COM_NUM.filter(s => s.grupo === grupoId)
     const map = {}
@@ -125,67 +121,69 @@ const desclicar = (e, s) => {
     { id: 'HIST', label: 'Hist.' },
     { id: 'CC', label: 'Coca' },
   ]
-  
+
   const gerarPDF = () => {
-  const linhas = GRUPOS.map(grupo => {
-    const selecoesMap = {}
-    STICKERS_COM_NUM.filter(s => s.grupo === grupo.id).forEach(s => {
-      if (!selecoesMap[s.selecao]) selecoesMap[s.selecao] = []
-      selecoesMap[s.selecao].push(s)
-    })
-    const timesHTML = Object.entries(selecoesMap).map(([sel, stickers]) => {
-      const sqHTML = stickers.map(s => {
-        const qtd = getQtd(s.numero)
-        const cod = s.codigo.replace(/(\D+)(\d+)/, '$1 $2')
-        if (qtd === 0) return `<div class="sq">${cod}</div>`
-        if (qtd === 1) return `<div class="sq preto"></div>`
-        return `<div class="sq preto rep"><span class="rdot"></span></div>`
+    const linhas = GRUPOS.map(grupo => {
+      const selecoesMap = {}
+      STICKERS_COM_NUM.filter(s => s.grupo === grupo.id).forEach(s => {
+        if (!selecoesMap[s.selecao]) selecoesMap[s.selecao] = []
+        selecoesMap[s.selecao].push(s)
+      })
+      const timesHTML = Object.entries(selecoesMap).map(([sel, stickers]) => {
+        const sqHTML = stickers.map(s => {
+          const qtd = getQtd(s.numero)
+          const cod = s.codigo.replace(/(\D+)(\d+)/, '$1 $2')
+          if (qtd === 0) return `<div class="sq">${cod}</div>`
+          if (qtd === 1) return `<div class="sq preto"></div>`
+          return `<div class="sq preto rep"><span class="rdot"></span></div>`
+        }).join('')
+        return `<div class="row"><div class="tnome">${sel}</div><div class="sqs">${sqHTML}</div></div>`
       }).join('')
-      return `<div class="row"><div class="tnome">${sel}</div><div class="sqs">${sqHTML}</div></div>`
+      return `<div class="grp"><div class="gtit">${grupo.nome}</div>${timesHTML}</div>`
     }).join('')
-    return `<div class="grp"><div class="gtit">${grupo.nome}</div>${timesHTML}</div>`
-  }).join('')
 
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Copa 2026</title>
-  <style>
-    @page { size: A4 portrait; margin: 8mm; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .header { text-align: center; margin-bottom: 4mm; border-bottom: 2px solid #006847; padding-bottom: 3mm; }
-    .header h1 { font-size: 13px; color: #006847; font-weight: 900; }
-    .header p { font-size: 7px; color: #555; margin-top: 1mm; }
-    .legenda { display: flex; gap: 6mm; justify-content: center; margin-bottom: 3mm; font-size: 7px; align-items: center; }
-    .leg { display: flex; align-items: center; gap: 1mm; }
-    .grp { margin-bottom: 2.5mm; break-inside: avoid; }
-    .gtit { font-size: 8px; font-weight: 900; background: #006847; color: white; padding: 1mm 2mm; border-radius: 2px; margin-bottom: 1mm; }
-    .row { display: flex; align-items: center; margin-bottom: 0.8mm; gap: 1mm; }
-    .tnome { font-size: 5.5px; font-weight: 700; width: 20mm; flex-shrink: 0; color: #333; line-height: 1.2; }
-    .sqs { display: flex; flex-wrap: wrap; gap: 0.4mm; }
-    .sq { width: 5.8mm; height: 5.8mm; border: 0.5px solid #aaa; border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 3.8px; font-weight: 700; color: #666; flex-shrink: 0; position: relative; }
-    .sq.preto { background: #111 !important; border-color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .sq.rep { background: #111; border: 1.5px solid #7c3aed; }
-    .rdot { position: absolute; top: 0.5px; right: 0.5px; width: 1.8px; height: 1.8px; background: #a855f7; border-radius: 50%; }
-    .leg-sq { width: 5mm; height: 5mm; border: 0.5px solid #aaa; border-radius: 1px; }
-    .leg-sq.p { background: #111; border-color: #111; }
-    .leg-sq.r { background: #111; border: 1.5px solid #7c3aed; position: relative; }
-  </style></head><body>
-  <div class="header">
-    <h1>🎴 Copa do Mundo 2026 — Lista de Figurinhas</h1>
-    <p>Impresso em ${new Date().toLocaleDateString('pt-BR')} · Total: ${TOTAL} figurinhas · No álbum: ${totalColadas} · Faltam: ${totalFaltam}</p>
-  </div>
-  <div class="legenda">
-    <div class="leg"><div class="leg-sq"></div> Não tenho</div>
-    <div class="leg"><div class="leg-sq p"></div> Tenho (colada)</div>
-    <div class="leg"><div class="leg-sq r"><span class="rdot"></span></div> Tenho repetida</div>
-  </div>
-  ${linhas}
-  </body></html>`
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Copa 2026</title>
+    <style>
+      @page { size: A4 portrait; margin: 8mm; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: Arial, sans-serif; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .header { text-align: center; margin-bottom: 4mm; border-bottom: 2px solid #006847; padding-bottom: 3mm; }
+      .header h1 { font-size: 13px; color: #006847; font-weight: 900; }
+      .header p { font-size: 7px; color: #555; margin-top: 1mm; }
+      .legenda { display: flex; gap: 6mm; justify-content: center; margin-bottom: 3mm; font-size: 7px; align-items: center; }
+      .leg { display: flex; align-items: center; gap: 1mm; }
+      .grp { margin-bottom: 2.5mm; break-inside: avoid; }
+      .gtit { font-size: 8px; font-weight: 900; background: #006847; color: white; padding: 1mm 2mm; border-radius: 2px; margin-bottom: 1mm; }
+      .row { display: flex; align-items: center; margin-bottom: 0.8mm; gap: 1mm; }
+      .tnome { font-size: 5.5px; font-weight: 700; width: 20mm; flex-shrink: 0; color: #333; line-height: 1.2; }
+      .sqs { display: flex; flex-wrap: wrap; gap: 0.4mm; }
+      .sq { width: 5.8mm; height: 5.8mm; border: 0.5px solid #aaa; border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 3.8px; font-weight: 700; color: #666; flex-shrink: 0; position: relative; }
+      .sq.preto { background: #111 !important; border-color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .sq.rep { background: #111; border: 1.5px solid #7c3aed; }
+      .rdot { position: absolute; top: 0.5px; right: 0.5px; width: 1.8px; height: 1.8px; background: #a855f7; border-radius: 50%; }
+      .leg-sq { width: 5mm; height: 5mm; border: 0.5px solid #aaa; border-radius: 1px; }
+      .leg-sq.p { background: #111; border-color: #111; }
+      .leg-sq.r { background: #111; border: 1.5px solid #7c3aed; position: relative; }
+    </style></head><body>
+    <div class="header">
+      <h1>🎴 Copa do Mundo 2026 — Lista de Figurinhas</h1>
+      <p>Impresso em ${new Date().toLocaleDateString('pt-BR')} · Total: ${TOTAL} figurinhas · No álbum: ${totalColadas} · Faltam: ${totalFaltam}</p>
+    </div>
+    <div class="legenda">
+      <div class="leg"><div class="leg-sq"></div> Não tenho</div>
+      <div class="leg"><div class="leg-sq p"></div> Tenho (colada)</div>
+      <div class="leg"><div class="leg-sq r"><span class="rdot"></span></div> Tenho repetida</div>
+    </div>
+    ${linhas}
+    </body></html>`
 
-  const win = window.open('', '_blank')
-  win.document.write(html)
-  win.document.close()
-  setTimeout(() => { win.focus(); win.print() }, 600)
-}
+    const win = window.open('', '_blank')
+    win.document.write(html)
+    win.document.close()
+    setTimeout(() => { win.focus(); win.print() }, 600)
+  }
+
+  const isMobile = window.innerWidth <= 768
 
   if (loading) return (
     <div className="loading">
@@ -199,13 +197,13 @@ const desclicar = (e, s) => {
       <header className="header">
         <div className="header-top">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-  <img 
-    src="https://cdn.prod.website-files.com/68f550992570ca0322737dc2/69f4a82e3685731a3ab5086e_fifa-world-cup-2026-official-logo-footylogos-white.png" 
-    alt="Copa 2026" 
-    style={{ height: '42px', width: 'auto' }} 
-  />
-  <h1 style={{ fontFamily: "'Righteous', sans-serif", fontSize: '32px', letterSpacing: '0px', fontWeight: 'bold' }}>Copa 2026</h1>
-</div>
+            <img
+              src="https://cdn.prod.website-files.com/68f550992570ca0322737dc2/69f4a82e3685731a3ab5086e_fifa-world-cup-2026-official-logo-footylogos-white.png"
+              alt="Copa 2026"
+              style={{ height: '42px', width: 'auto' }}
+            />
+            <h1 style={{ fontFamily: "'Righteous', sans-serif", fontSize: '32px', letterSpacing: '0px', fontWeight: 'bold' }}>Copa 2026</h1>
+          </div>
           <div className="zap-btns">
             <button className={`btn-zap faltam ${zapMsg === 'faltam' ? 'ok' : ''}`} onClick={zapFaltam}>
               {zapMsg === 'faltam' ? '✅' : '❌'} Faltam
@@ -213,8 +211,7 @@ const desclicar = (e, s) => {
             <button className={`btn-zap repetidas ${zapMsg === 'repetidas' ? 'ok' : ''}`} onClick={zapRepetidas}>
               {zapMsg === 'repetidas' ? '✅' : '🔄'} Repetidas
             </button>
-            <button className="btn-zap pdf" onClick={gerarPDF}>🖨️ PDF
-            </button>
+            <button className="btn-zap pdf" onClick={gerarPDF}>🖨️ PDF</button>
           </div>
         </div>
         <div className="stats">
@@ -238,7 +235,7 @@ const desclicar = (e, s) => {
         <span className="leg cinza">⬜ Não tenho</span>
         <span className="leg verde">🟩 No álbum</span>
         <span className="leg roxo">🟪 Repetida</span>
-        <span className="dica">Clique = +1 · Botão direito = -1</span>
+        <span className="dica">{isMobile ? 'Toque = +1 · Botão − = -1' : 'Clique = +1 · Botão direito = -1'}</span>
       </div>
 
       <div className="conteudo">
@@ -250,10 +247,10 @@ const desclicar = (e, s) => {
                 {selObj.nome !== 'Apresentação' && selObj.nome !== 'História' && selObj.nome !== 'Coca-Cola' && selObj.nome !== 'Capa' && (
                   <h3 className="time-titulo">
                     {(() => { const fc = FLAGS[getSigla(selObj.stickers[0].codigo)]; return fc ? <img src={`https://flagcdn.com/20x15/${fc}.png`} alt="" className="flag-img" /> : selObj.bandeira })()}
-                      {selObj.nome}
-                     <span className="time-pct">
-                       {((selObj.stickers.filter(s => getQtd(s.numero) >= 1).length / selObj.stickers.length) * 100).toFixed(2)}%
-                     </span>
+                    {selObj.nome}
+                    <span className="time-pct">
+                      {((selObj.stickers.filter(s => getQtd(s.numero) >= 1).length / selObj.stickers.length) * 100).toFixed(2)}%
+                    </span>
                   </h3>
                 )}
                 <div className="grid">
@@ -261,25 +258,21 @@ const desclicar = (e, s) => {
                     const qtd = getQtd(s.numero)
                     return (
                       <div
-  key={s.numero}
-  className={getCardClass(qtd, s.tipo)}
-  onContextMenu={(e) => desclicar(e, s)}
-  title={`${s.codigo} · ${s.nome}`}
->
-  <span className="card-cod" style={{ fontFamily: "'Righteous', sans-serif" }}>{s.codigo.replace(/(\D+)(\d+)/, '$1 $2')}</span>
-  {ICONE_TIPO[s.tipo] && <span className="card-tipo-icon">{ICONE_TIPO[s.tipo]}</span>}
-  <span className="card-nome" onClick={() => clicar(s)}>{s.nome}</span>
-  {qtd >= 2 && <span className="card-extra">+{qtd - 1}</span>}
-  {saving === s.numero && <span className="card-saving">⏳</span>}
-  {qtd > 0 && window.innerWidth <= 768 && (
-  <button className="card-minus" onClick={(e) => { e.stopPropagation(); desclicar(e, s) }}>−</button>
-)}
-Só adicionei && window.innerWidth <= 768 no meio! 🎯
-
-
-
-  <div className="card-add" onClick={() => clicar(s)} />
-</div>
+                        key={s.numero}
+                        className={getCardClass(qtd, s.tipo)}
+                        onClick={() => clicar(s)}
+                        onContextMenu={(e) => desclicar(e, s)}
+                        title={`${s.codigo} · ${s.nome}`}
+                      >
+                        <span className="card-cod" style={{ fontFamily: "'Righteous', sans-serif" }}>{s.codigo.replace(/(\D+)(\d+)/, '$1 $2')}</span>
+                        {ICONE_TIPO[s.tipo] && <span className="card-tipo-icon">{ICONE_TIPO[s.tipo]}</span>}
+                        <span className="card-nome">{s.nome}</span>
+                        {qtd >= 2 && <span className="card-extra">+{qtd - 1}</span>}
+                        {saving === s.numero && <span className="card-saving">⏳</span>}
+                        {qtd > 0 && isMobile && (
+                          <button className="card-minus" onClick={(e) => { e.stopPropagation(); desclicar(e, s) }}>−</button>
+                        )}
+                      </div>
                     )
                   })}
                 </div>
