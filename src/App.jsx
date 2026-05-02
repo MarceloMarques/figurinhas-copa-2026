@@ -281,19 +281,21 @@ const desclicar = (e, s) => {
                     const qtd = getQtd(s.numero)
                     return (
                       <div
-                        key={s.numero}
-                        className={getCardClass(qtd, s.tipo)}
-                        onClick={() => clicar(s)}
-                        onContextMenu={(e) => desclicar(e, s)}
-                        onDoubleClick={(e) => desclicar(e, s)}
-                        title={`${s.codigo} · ${s.nome} · Clique +1 · Botão direito -1`}
-                      >
-                        <span className="card-cod" style={{ fontFamily: "'Righteous', sans-serif" }}>{s.codigo.replace(/(\D+)(\d+)/, '$1 $2')}</span>
-                        {ICONE_TIPO[s.tipo] && <span className="card-tipo-icon">{ICONE_TIPO[s.tipo]}</span>}
-                        <span className="card-nome">{s.nome}</span>
-                        {qtd >= 2 && <span className="card-extra">+{qtd - 1}</span>}
-                        {saving === s.numero && <span className="card-saving">⏳</span>}
-                      </div>
+  key={s.numero}
+  className={getCardClass(qtd, s.tipo)}
+  onContextMenu={(e) => desclicar(e, s)}
+  title={`${s.codigo} · ${s.nome}`}
+>
+  <span className="card-cod" style={{ fontFamily: "'Righteous', sans-serif" }}>{s.codigo.replace(/(\D+)(\d+)/, '$1 $2')}</span>
+  {ICONE_TIPO[s.tipo] && <span className="card-tipo-icon">{ICONE_TIPO[s.tipo]}</span>}
+  <span className="card-nome" onClick={() => clicar(s)}>{s.nome}</span>
+  {qtd >= 2 && <span className="card-extra">+{qtd - 1}</span>}
+  {saving === s.numero && <span className="card-saving">⏳</span>}
+  {qtd > 0 && (
+    <button className="card-minus" onClick={(e) => { e.stopPropagation(); desclicar(e, s) }}>−</button>
+  )}
+  <div className="card-add" onClick={() => clicar(s)} />
+</div>
                     )
                   })}
                 </div>
