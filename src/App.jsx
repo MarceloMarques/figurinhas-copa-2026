@@ -251,6 +251,7 @@ export default function App() {
                         className={getCardClass(qtd, s.tipo)}
                         onClick={() => clicar(s)}
                         onContextMenu={(e) => desclicar(e, s)}
+                        onDoubleClick={(e) => desclicar(e, s)}
                         title={`${s.codigo} · ${s.nome} · Clique +1 · Botão direito -1`}
                       >
                         <span className="card-cod" style={{ fontFamily: "'Righteous', sans-serif" }}>{s.codigo.replace(/(\D+)(\d+)/, '$1 $2')}</span>
