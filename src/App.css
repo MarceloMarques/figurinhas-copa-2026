@@ -43,7 +43,8 @@ body { font-family: 'Montserrat', sans-serif; background: #f0f4f8; color: #1a202
 .conteudo { padding: 0 16px; }
 .grupo { margin-bottom: 24px; }
 .grupo-titulo { font-size: 16px; font-weight: 900; color: #006847; padding: 7px 12px; background: white; border-radius: 10px; border-left: 4px solid #006847; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-.time { margin-bottom: 12px; }
+.time { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+.time:last-child { border-bottom: none; }
 .time-titulo { font-size: 13px; font-weight: 700; color: #4a5568; margin-bottom: 7px; padding-left: 2px; display: flex; align-items: center; gap: 8px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; }
 
