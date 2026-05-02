@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from './supabaseClient'
 import { STICKERS, GRUPOS, TOTAL } from './data/stickers'
 import './App.css'
@@ -46,8 +46,42 @@ export default function App() {
     setSaving(null)
   }
 
-  const clicar = (s) => { const n = getQtd(s.numero) + 1; setQtds(p => ({ ...p, [s.numero]: n })); salvar(s, n) }
-  const desclicar = (e, s) => { e.preventDefault(); const a = getQtd(s.numero); if (!a) return; const n = a - 1; setQtds(p => ({ ...p, [s.numero]: n })); salvar(s, n) }
+  const lastTap = useRef({})
+
+const clicar = (s) => {
+  const agora = Date.now()
+  const ultimo = lastTap.current[s.numero] || 0
+  const diff = agora - ultimo
+
+  if (diff < 300) {
+    // double tap — diminui
+    lastTap.current[s.numero] = 0
+    const atual = getQtd(s.numero)
+    if (!atual) return
+    const n = atual - 1
+    setQtds(p => ({ ...p, [s.numero]: n }))
+    salvar(s, n)
+  } else {
+    // single tap — aumenta
+    lastTap.current[s.numero] = agora
+    setTimeout(() => {
+      if (lastTap.current[s.numero] === agora) {
+        const n = getQtd(s.numero) + 1
+        setQtds(p => ({ ...p, [s.numero]: n }))
+        salvar(s, n)
+      }
+    }, 300)
+  }
+}
+
+const desclicar = (e, s) => {
+  e.preventDefault()
+  const atual = getQtd(s.numero)
+  if (!atual) return
+  const n = atual - 1
+  setQtds(p => ({ ...p, [s.numero]: n }))
+  salvar(s, n)
+}
 
   const totalColadas = STICKERS_COM_NUM.filter(s => getQtd(s.numero) >= 1).length
   const totalRepetidas = STICKERS_COM_NUM.reduce((acc, s) => acc + Math.max(0, getQtd(s.numero) - 1), 0)
