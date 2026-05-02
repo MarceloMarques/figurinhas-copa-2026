@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import { STICKERS, GRUPOS, TOTAL } from './data/stickers'
 import './App.css'
@@ -271,9 +271,13 @@ const desclicar = (e, s) => {
   <span className="card-nome" onClick={() => clicar(s)}>{s.nome}</span>
   {qtd >= 2 && <span className="card-extra">+{qtd - 1}</span>}
   {saving === s.numero && <span className="card-saving">⏳</span>}
-  {qtd > 0 && (
-    <button className="card-minus" onClick={(e) => { e.stopPropagation(); desclicar(e, s) }}>−</button>
-  )}
+  {qtd > 0 && window.innerWidth <= 768 && (
+  <button className="card-minus" onClick={(e) => { e.stopPropagation(); desclicar(e, s) }}>−</button>
+)}
+Só adicionei && window.innerWidth <= 768 no meio! 🎯
+
+
+
   <div className="card-add" onClick={() => clicar(s)} />
 </div>
                     )
