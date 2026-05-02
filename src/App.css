@@ -38,7 +38,7 @@ body { font-family: 'Montserrat', sans-serif; background: #f0f4f8; color: #1a202
 .filtro:hover:not(.ativo) { border-color: #006847; color: #006847; }
 
 .dropdown-wrapper { position: relative; }
-.dropdown-lista { position: absolute; top: 110%; left: 0; background: white; border: 1.5px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 100; max-height: 300px; overflow-y: auto; min-width: 180px; padding: 4px 0; }
+.dropdown-lista { position: absolute; top: 110%; left: 0; background: white; border: 1.5px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 9999; max-height: 300px; overflow-y: auto; min-width: 180px; padding: 4px 0; }
 .dropdown-item { padding: 8px 14px; font-size: 13px; cursor: pointer; color: #1a202c; font-family: 'Righteous', sans-serif; }
 .dropdown-item:hover { background: #f0fdf4; color: #006847; }
 .dropdown-item.ativo { background: #006847; color: white; }
