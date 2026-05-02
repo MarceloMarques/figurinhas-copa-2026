@@ -185,7 +185,7 @@ export default function App() {
     </style></head><body>
     <div class="header">
       <h1>Copa do Mundo 2026 - Lista de Figurinhas</h1>
-      <p>Impresso em ${new Date().toLocaleDateString('pt-BR')} - Total: ${TOTAL} figurinhas - No album: ${totalColadas} - Faltam: ${totalFaltam}</p>
+      <p>Impresso em ${new Date().toLocaleDateString('pt-BR')} - Total: ${TOTAL} - No album: ${totalColadas} - Faltam: ${totalFaltam}</p>
     </div>
     <div class="legenda">
       <div class="leg"><div class="leg-sq"></div> Nao tenho</div>
@@ -241,12 +241,14 @@ export default function App() {
         <div className="barra-fundo"><div className="barra-progresso" style={{ width: `${progresso}%` }} /></div>
       </header>
 
-      <div className="filtros">
-        {filtros.map(f => (
-          <button key={f.id} className={`filtro ${grupoAtivo === f.id && !paisAtivo ? 'ativo' : ''}`} onClick={() => { setGrupoAtivo(f.id); setPaisAtivo(''); setDropdownAberto(false) }}>
-            {f.label}
-          </button>
-        ))}
+      <div className="filtros-area">
+        <div className="filtros">
+          {filtros.map(f => (
+            <button key={f.id} className={`filtro ${grupoAtivo === f.id && !paisAtivo ? 'ativo' : ''}`} onClick={() => { setGrupoAtivo(f.id); setPaisAtivo(''); setDropdownAberto(false) }}>
+              {f.label}
+            </button>
+          ))}
+        </div>
         <div className="dropdown-wrapper">
           <button className={`filtro ${paisAtivo ? 'ativo' : ''}`} onClick={() => setDropdownAberto(p => !p)}>
             {paisAtivo || 'País'} ▾
