@@ -11,25 +11,11 @@ const FLAGS = {
   FRA:'fr',SEN:'sn',IRQ:'iq',NOR:'no',ARG:'ar',ALG:'dz',AUT:'at',JOR:'jo',
   POR:'pt',COD:'cd',UZB:'uz',COL:'co',ENG:'gb-eng',CRO:'hr',GHA:'gh',PAN:'pa',
 }
-
-const PAISES = [
-  'África do Sul','Alemanha','Arábia Saudita','Argélia','Argentina','Áustria',
-  'Austrália','Bélgica','Bósnia e Herzegovina','Brasil','Cabo Verde','Canadá',
-  'Catar','Colômbia','Coreia do Sul','Costa do Marfim','Croácia','Curaçao',
-  'Egito','Equador','Escócia','Espanha','Estados Unidos','França','Gana',
-  'Haiti','Holanda','Inglaterra','Irã','Iraque','Japão','Jordânia',
-  'Marrocos','México','Nova Zelândia','Noruega','Panamá','Paraguai',
-  'Portugal','RD Congo','República Tcheca','Senegal','Suécia','Suíça',
-  'Tunísia','Turquia','Uruguai','Uzbequistão',
-].sort()
 const getSigla = (cod) => cod.replace(/\d+$/, '')
 
 const STICKERS_COM_NUM = STICKERS.map((s, i) => ({ ...s, numero: i + 1 }))
 
 const ICONE_TIPO = { escudo: '🛡️', foto: '📸', especial: '⭐', cc: '🥤', normal: '' }
-
-const [paisAtivo, setPaisAtivo] = useState('')
-const [dropdownAberto, setDropdownAberto] = useState(false)
 
 export default function App() {
   const [qtds, setQtds] = useState({})
@@ -125,14 +111,8 @@ export default function App() {
   }
 
   const gruposExibidos = grupoAtivo === 'TODOS'
-  ? GRUPOS
-  : GRUPOS.filter(g => g.id === grupoAtivo)
-
-const selecoesExibidas = (grupoId) => {
-  const todas = getSelecoesDoGrupo(grupoId)
-  if (!paisAtivo) return todas
-  return todas.filter(s => s.nome === paisAtivo)
-}
+    ? GRUPOS
+    : GRUPOS.filter(g => g.id === grupoAtivo)
 
   const filtros = [
     { id: 'TODOS', label: 'Todas' },
@@ -244,31 +224,12 @@ const selecoesExibidas = (grupoId) => {
       </header>
 
       <div className="filtros">
-  {filtros.map(f => (
-    <button key={f.id} className={`filtro ${grupoAtivo === f.id && !paisAtivo ? 'ativo' : ''}`} onClick={() => { setGrupoAtivo(f.id); setPaisAtivo(''); setDropdownAberto(false) }}>
-      {f.label}
-    </button>
-  ))}
-  <div className="dropdown-wrapper">
-    <button className={`filtro ${paisAtivo ? 'ativo' : ''}`} onClick={() => setDropdownAberto(p => !p)}>
-      {paisAtivo || 'País'} ▾
-    </button>
-    {dropdownAberto && (
-      <div className="dropdown-lista">
-        {paisAtivo && (
-          <div className="dropdown-item limpar" onClick={() => { setPaisAtivo(''); setDropdownAberto(false) }}>
-            ✕ Limpar filtro
-          </div>
-        )}
-        {PAISES.map(p => (
-          <div key={p} className={`dropdown-item ${paisAtivo === p ? 'ativo' : ''}`} onClick={() => { setPaisAtivo(p); setDropdownAberto(false) }}>
-            {p}
-          </div>
+        {filtros.map(f => (
+          <button key={f.id} className={`filtro ${grupoAtivo === f.id ? 'ativo' : ''}`} onClick={() => setGrupoAtivo(f.id)}>
+            {f.label}
+          </button>
         ))}
       </div>
-    )}
-  </div>
-</div>
 
       <div className="legenda">
         <span className="leg cinza">⬜ Não tenho</span>
@@ -281,7 +242,7 @@ const selecoesExibidas = (grupoId) => {
         {gruposExibidos.map(grupo => (
           <div key={grupo.id} className="grupo">
             <h2 className="grupo-titulo">{grupo.nome}</h2>
-            {selecoesExibidas(grupo.id).map(selObj => (
+            {getSelecoesDoGrupo(grupo.id).map(selObj => (
               <div key={selObj.nome} className="time">
                 {selObj.nome !== 'Apresentação' && selObj.nome !== 'História' && selObj.nome !== 'Coca-Cola' && selObj.nome !== 'Capa' && (
                   <h3 className="time-titulo">
