@@ -123,7 +123,9 @@ export default function App() {
     return Object.values(map)
   }
 
-  const gruposExibidos = grupoAtivo === 'TODOS'
+  const gruposExibidos = paisAtivo
+  ? GRUPOS.filter(g => g.stickers && STICKERS_COM_NUM.some(s => s.grupo === g.id && s.selecao === paisAtivo))
+  : grupoAtivo === 'TODOS'
     ? GRUPOS
     : GRUPOS.filter(g => g.id === grupoAtivo)
 
@@ -262,7 +264,7 @@ export default function App() {
                 </div>
               )}
               {PAISES.map(p => (
-                <div key={p} className={`dropdown-item ${paisAtivo === p ? 'ativo' : ''}`} onClick={() => { setPaisAtivo(p); setDropdownAberto(false) }}>
+                <div key={p} className={`dropdown-item ${paisAtivo === p ? 'ativo' : ''}`} onClick={() => { setPaisAtivo(p); setGrupoAtivo('TODOS'); setDropdownAberto(false) }}>
                   {p}
                 </div>
               ))}
