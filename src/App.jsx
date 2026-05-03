@@ -51,7 +51,7 @@ useEffect(() => {
 }, [])
 
 const loadData = async () => {
-  const { data } = await supabase.from('figurinhas').select('numero, quantidade')
+  const { data } = await supabase.from('figurinhas').select('numero, quantidade').eq('user_id', user.id)
   if (data) setQtds(Object.fromEntries(data.map(r => [r.numero, r.quantidade])))
   setLoading(false)
 }
@@ -59,16 +59,19 @@ const loadData = async () => {
   const getQtd = (num) => qtds[num] || 0
 
   const salvar = async (sticker, novaQtd) => {
-    setSaving(sticker.numero)
-    if (novaQtd === 0) {
-      await supabase.from('figurinhas').delete().eq('numero', sticker.numero)
+  setSaving(sticker.numero)
+  if (novaQtd === 0) {
+    await supabase.from('figurinhas').delete().eq('numero', sticker.numero).eq('user_id', user.id)
+  } else {
+    const { data } = await supabase.from('figurinhas').select('id').eq('numero', sticker.numero).eq('user_id', user.id).maybeSingle()
+    if (data) {
+      await supabase.from('figurinhas').update({ quantidade: novaQtd }).eq('numero', sticker.numero).eq('user_id', user.id)
     } else {
-      const { data } = await supabase.from('figurinhas').select('id').eq('numero', sticker.numero).maybeSingle()
-      if (data) await supabase.from('figurinhas').update({ quantidade: novaQtd }).eq('numero', sticker.numero)
-      else await supabase.from('figurinhas').insert({ numero: sticker.numero, nome: sticker.nome, selecao: sticker.selecao, grupo: sticker.grupo, tipo: sticker.tipo, quantidade: novaQtd })
+      await supabase.from('figurinhas').insert({ numero: sticker.numero, nome: sticker.nome, selecao: sticker.selecao, grupo: sticker.grupo, tipo: sticker.tipo, quantidade: novaQtd, user_id: user.id })
     }
-    setSaving(null)
   }
+  setSaving(null)
+}
 
   const clicar = (s) => {
     const n = getQtd(s.numero) + 1
