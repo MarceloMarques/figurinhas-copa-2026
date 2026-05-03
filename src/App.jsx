@@ -21,7 +21,7 @@ const PAISES = [
   'Marrocos','México','Nova Zelândia','Noruega','Panamá','Paraguai',
   'Portugal','RD Congo','República Tcheca','Senegal','Suécia','Suíça',
   'Tunísia','Turquia','Uruguai','Uzbequistão',
-].sort()
+].sort((a, b) => a.normalize('NFD').replace(/[\u0300-\u036f]/g, '').localeCompare(b.normalize('NFD').replace(/[\u0300-\u036f]/g, '')))
 
 const getSigla = (cod) => cod.replace(/\d+$/, '')
 const STICKERS_COM_NUM = STICKERS.map((s, i) => ({ ...s, numero: i + 1 }))
