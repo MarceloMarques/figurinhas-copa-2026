@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import { STICKERS, GRUPOS, TOTAL } from './data/stickers'
+import Auth from './Auth'
 import './App.css'
 
 const FLAGS = {
@@ -36,12 +37,24 @@ export default function App() {
   const [paisAtivo, setPaisAtivo] = useState('')
   const [dropdownAberto, setDropdownAberto] = useState(false)
 
-  useEffect(() => {
-    supabase.from('figurinhas').select('numero, quantidade').then(({ data }) => {
-      if (data) setQtds(Object.fromEntries(data.map(r => [r.numero, r.quantidade])))
-      setLoading(false)
-    })
-  }, [])
+  const [user, setUser] = useState(null)
+
+useEffect(() => {
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setUser(session?.user ?? null)
+    if (session?.user) loadData()
+  })
+  supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null)
+    if (session?.user) loadData()
+  })
+}, [])
+
+const loadData = async () => {
+  const { data } = await supabase.from('figurinhas').select('numero, quantidade')
+  if (data) setQtds(Object.fromEntries(data.map(r => [r.numero, r.quantidade])))
+  setLoading(false)
+}
 
   const getQtd = (num) => qtds[num] || 0
 
@@ -205,6 +218,8 @@ export default function App() {
   }
 
   const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+
+  if (!user) return <Auth />
 
   if (loading) return (
     <div className="loading">
