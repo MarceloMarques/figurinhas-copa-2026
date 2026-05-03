@@ -107,3 +107,5 @@ body { font-family: 'Montserrat', sans-serif; background: #f0f4f8; color: #1a202
 .auth-btn { width: 100%; padding: 13px; background: linear-gradient(135deg, #006847, #00a550); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; font-family: 'Righteous', sans-serif; cursor: pointer; transition: opacity .2s; }
 .auth-btn:hover { opacity: 0.9; }
 .auth-btn:disabled { opacity: 0.6; }
+.btn-zap.sair { background: #64748b; color: white; }
+.btn-zap.sair:hover { background: #475569; }

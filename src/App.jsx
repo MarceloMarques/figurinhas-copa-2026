@@ -36,42 +36,46 @@ export default function App() {
   const [zapMsg, setZapMsg] = useState('')
   const [paisAtivo, setPaisAtivo] = useState('')
   const [dropdownAberto, setDropdownAberto] = useState(false)
-
   const [user, setUser] = useState(null)
 
-useEffect(() => {
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setUser(session?.user ?? null)
-    if (session?.user) loadData()
-  })
-  supabase.auth.onAuthStateChange((_event, session) => {
-    setUser(session?.user ?? null)
-    if (session?.user) loadData()
-  })
-}, [])
+  const loadData = async (u) => {
+    const { data } = await supabase.from('figurinhas').select('numero, quantidade').eq('user_id', u.id)
+    if (data) setQtds(Object.fromEntries(data.map(r => [r.numero, r.quantidade])))
+    setLoading(false)
+  }
 
-const loadData = async () => {
-  const { data } = await supabase.from('figurinhas').select('numero, quantidade').eq('user_id', user.id)
-  if (data) setQtds(Object.fromEntries(data.map(r => [r.numero, r.quantidade])))
-  setLoading(false)
-}
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const u = session?.user ?? null
+      setUser(u)
+      if (u) loadData(u)
+      else setLoading(false)
+    })
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      const u = session?.user ?? null
+      setUser(u)
+      if (u) loadData(u)
+      else setLoading(false)
+    })
+  }, [])
 
   const getQtd = (num) => qtds[num] || 0
 
   const salvar = async (sticker, novaQtd) => {
-  setSaving(sticker.numero)
-  if (novaQtd === 0) {
-    await supabase.from('figurinhas').delete().eq('numero', sticker.numero).eq('user_id', user.id)
-  } else {
-    const { data } = await supabase.from('figurinhas').select('id').eq('numero', sticker.numero).eq('user_id', user.id).maybeSingle()
-    if (data) {
-      await supabase.from('figurinhas').update({ quantidade: novaQtd }).eq('numero', sticker.numero).eq('user_id', user.id)
+    setSaving(sticker.numero)
+    if (novaQtd === 0) {
+      await supabase.from('figurinhas').delete().eq('numero', sticker.numero).eq('user_id', user.id)
     } else {
-      await supabase.from('figurinhas').insert({ numero: sticker.numero, nome: sticker.nome, selecao: sticker.selecao, grupo: sticker.grupo, tipo: sticker.tipo, quantidade: novaQtd, user_id: user.id })
+      const { data } = await supabase.from('figurinhas').select('id').eq('numero', sticker.numero).eq('user_id', user.id).maybeSingle()
+      if (data) {
+        await supabase.from('figurinhas').update({ quantidade: novaQtd }).eq('numero', sticker.numero).eq('user_id', user.id)
+      } else {
+        await supabase.from('figurinhas').insert({ numero: sticker.numero, nome: sticker.nome, selecao: sticker.selecao, grupo: sticker.grupo, tipo: sticker.tipo, quantidade: novaQtd, user_id: user.id })
+      }
     }
+    setSaving(null)
   }
-  setSaving(null)
-}
 
   const clicar = (s) => {
     const n = getQtd(s.numero) + 1
@@ -123,11 +127,11 @@ const loadData = async () => {
   }
 
   const getCardClass = (qtd, tipo) => {
-  if (qtd === 0) return `card cinza tipo-${tipo}`
-  if (qtd === 1 && tipo === 'escudo') return `card dourado tipo-${tipo}`
-  if (qtd === 1) return `card verde tipo-${tipo}`
-  return `card roxo tipo-${tipo}`
-}
+    if (qtd === 0) return `card cinza tipo-${tipo}`
+    if (qtd === 1 && tipo === 'escudo') return `card dourado tipo-${tipo}`
+    if (qtd === 1) return `card verde tipo-${tipo}`
+    return `card roxo tipo-${tipo}`
+  }
 
   const getSelecoesDoGrupo = (grupoId) => {
     const stickers = STICKERS_COM_NUM.filter(s => s.grupo === grupoId)
@@ -140,10 +144,10 @@ const loadData = async () => {
   }
 
   const gruposExibidos = paisAtivo
-  ? GRUPOS.filter(g => g.stickers && STICKERS_COM_NUM.some(s => s.grupo === g.id && s.selecao === paisAtivo))
-  : grupoAtivo === 'TODOS'
-    ? GRUPOS
-    : GRUPOS.filter(g => g.id === grupoAtivo)
+    ? GRUPOS.filter(g => STICKERS_COM_NUM.some(s => s.grupo === g.id && s.selecao === paisAtivo))
+    : grupoAtivo === 'TODOS'
+      ? GRUPOS
+      : GRUPOS.filter(g => g.id === grupoAtivo)
 
   const selecoesExibidas = (grupoId) => {
     const todas = getSelecoesDoGrupo(grupoId)
@@ -251,6 +255,7 @@ const loadData = async () => {
               {zapMsg === 'repetidas' ? '✅' : '🔄'} Repetidas
             </button>
             <button className="btn-zap pdf" onClick={gerarPDF}>🖨️ PDF</button>
+            <button className="btn-zap sair" onClick={() => supabase.auth.signOut()}>🚪 Sair</button>
           </div>
         </div>
         <div className="stats">
